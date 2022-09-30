@@ -2,7 +2,7 @@ typedef struct {
 	char* title;
 	struct node* parent;
 	struct node* child [5];
-	void (*fun_ptr)(void);
+	void (*fun_ptr)();
 	uint8_t index;
 	} node;
 
@@ -108,16 +108,22 @@ void GUI_init(){
 	
 }
 
-void GUI_main_menu(uint8_t page){
+void GUI_main_menu(uint8_t page,uint8_t back){
 	set_current_node(main_menu);
 	OLED_clear();
 	OLED_goto_pos(1,8);
 	OLED_print_string("PING PONG GAME");
+	uint8_t dir;
+	if (back==0)
+	dir=curr_arrow_pos%2; 
+	else 
+	dir=!(curr_arrow_pos%2); 
+	
 
 	if(page ==2){
 		OLED_goto_pos(3,32);
 		OLED_print_string("Quit");
-		move_arrow(curr_arrow_pos%2);
+		move_arrow(dir);
 		
 	}
 	else if(page == 1){
@@ -125,14 +131,15 @@ void GUI_main_menu(uint8_t page){
 		OLED_print_string("Calibrate");
 		OLED_goto_pos(5,32);
 		OLED_print_string("Set difficulty");
-		move_arrow(curr_arrow_pos%2);
+		move_arrow(dir);
 	}
 	else {
 		OLED_goto_pos(3,32);
 		OLED_print_string("Play");
 		OLED_goto_pos(5,32);
 		OLED_print_string("See/reset hs");		
-		move_arrow(curr_arrow_pos%2);
+		move_arrow(dir);
+		printf("PAGE=%d\n",page);
 	}
 }
 
@@ -180,7 +187,7 @@ void menu_navigation(){
 			if (curr_arrow_pos%2 ==0 ){		
 				move_arrow(0);
 			}
-			else GUI_main_menu(((int)(curr_arrow_pos/2))+1);
+			else GUI_main_menu(((int)(curr_arrow_pos/2))+1,0);
 			
 			curr_arrow_pos=curr_arrow_pos+1;			
 			}
@@ -189,14 +196,13 @@ void menu_navigation(){
 			if (curr_arrow_pos%2 ==1 ){		
 				move_arrow(1);		
 			}
-			else GUI_main_menu(((int)(curr_arrow_pos/2))-1);
+			else GUI_main_menu(((int)(curr_arrow_pos/2))-1,0);
 			curr_arrow_pos=curr_arrow_pos-1;
 		}
 		
 	
 		//printf("CURRENT ARROW=%d\n",curr_arrow_pos);
 		//printf("joystick=%d\n",joystick.y_pos);
-		value = PINB;
 		
 		if(joystick.x_currdir == "RIGHT"){
 			set_current_node(get_current_node()->child[curr_arrow_pos]);
@@ -208,14 +214,16 @@ void menu_navigation(){
 	else{
 		if(joystick.x_currdir == "LEFT"){
 			set_current_node(get_current_node()->parent);
-			get_current_node()->fun_ptr();
+			get_current_node()->fun_ptr(((int)(curr_arrow_pos/2)),1);
 		}
-			node * par_node = (get_current_node()->parent);
-			char * title = par_node->title;
-			char * title2 = get_current_node()->title;
-			printf("parent: %s, current node: %s \n", title, title2);
+			
+			
 	}
 	//printf("%s\n",play->title);
+	node * par_node = (get_current_node()->parent);
+			char * title = par_node->title;
+			char * title2 = get_current_node()->title;
+	printf("parent: %s, current node: %s CURRENT ARROW=%d\n", title, title2,curr_arrow_pos);
 }
 
 

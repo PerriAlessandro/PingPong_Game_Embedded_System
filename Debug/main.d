@@ -22,7 +22,7 @@ main.d main.o: .././main.c \
  .././Uart_driver.h .././usart_driver.h .././xmem_driver.h .././ADC.h \
  .././positions.h .././OLED.h .././fonts.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\pgmspace.h \
- .././GUI.h
+ .././GUI.h .././MCP2515_driver.h .././SPI.h .././mcp2515.h
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h:
 
@@ -81,3 +81,9 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\pgmspace.h:
 
 .././GUI.h:
+
+.././MCP2515_driver.h:
+
+.././SPI.h:
+
+.././mcp2515.h:

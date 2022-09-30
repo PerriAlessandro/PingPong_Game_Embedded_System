@@ -14,7 +14,7 @@
 #include "positions.h"
 #include "OLED.h"
 #include "GUI.h"
-
+#include "MCP2515_driver.h"
 
 int main(){
 	uart_init(9600);
@@ -25,10 +25,12 @@ int main(){
 	OLED_clear();
 	//OLED_clear_arrow();
 	GUI_menu_init();
-	DDRB = 0x00;
+	SPI_MasterInit();
+	
 	while (1){
 		menu_navigation();
-		_delay_ms(1000);
+		_delay_ms(500);
+		MCP2515_read(0b11001100);
 	}
 }
 
