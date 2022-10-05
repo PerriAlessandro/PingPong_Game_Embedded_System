@@ -181,6 +181,8 @@ void menu_navigation(){
 	 printf("node : %s, parent node: %s \n", title_1, title_1_p);*/
 	
 	joystick = get_joypos();
+	printf("-----------------------------------------------------------\n");
+	//printf("dir : %s\n",joystick.x_currdir);
 	if (curr_mode->title == "Main Menu"){
 		if(joystick.y_currdir == "DOWN" && curr_arrow_pos<END_MAIN_MENU){	
 			
@@ -223,7 +225,7 @@ void menu_navigation(){
 	node * par_node = (get_current_node()->parent);
 			char * title = par_node->title;
 			char * title2 = get_current_node()->title;
-	printf("parent: %s, current node: %s CURRENT ARROW=%d\n", title, title2,curr_arrow_pos);
+	//printf("parent: %s, current node: %s CURRENT ARROW=%d\n", title, title2,curr_arrow_pos);
 }
 
 

@@ -154,6 +154,24 @@ Copyright 2003 Kimberly Otten Software Consulting
 #define MCP_WAKIF		0x40
 #define MCP_MERRF		0x80
 
+// Transmission
+
+#define TXB0SIDH 0x31
+#define TXB1SIDH 0x41
+#define TXB2SIDH 0x51
+#define TXB0SIDL 0x32
+#define TXB1SIDL 0x42
+#define TXB2SIDL 0x52
+#define TXB0DLC 0x35
+#define TXB1DLC 0x45
+#define TXB2DLC 0x55
+
+
+#define TXB0D0 0x36
+#define TXB1D0 0x46
+#define TXB2D0 0x56
+
+
 
 
 #endif

@@ -33,7 +33,7 @@ struct joy_pos get_joypos(){
     xmem_read(0x00, BASE_ADDRESS_ADC);
 	_delay_us(5000);
 
-	if (joystick.x_pos>160 && joystick.x_pos<170) 
+	if (joystick.x_pos>160 && joystick.x_pos<175) 
 		{joystick.x_pos = 0;
 		joystick.x_currdir="NEUTRAL";
 		}
@@ -41,7 +41,7 @@ struct joy_pos get_joypos(){
 		joystick.x_pos=(joystick.x_pos*100/166)-100;
 		joystick.x_currdir="LEFT";
 		}	
-	else if(joystick.x_pos>=170 && joystick.x_pos<256){
+	else if(joystick.x_pos>=175 && joystick.x_pos<256){
 		joystick.x_pos=((joystick.x_pos-170)*100/85);
 		joystick.x_currdir="RIGHT";
 		}
@@ -67,7 +67,6 @@ struct joy_pos get_joypos(){
 		joystick.y_pos=0;
 		joystick.y_currdir="---";
 	}
-	
 	return joystick;		
 }
 
