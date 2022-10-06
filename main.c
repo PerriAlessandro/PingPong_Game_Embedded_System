@@ -25,10 +25,23 @@ int main(){
 	PWM_init();
 	OLED_init();
 	OLED_clear();
-	//OLED_clear_arrow();
 	GUI_menu_init();
+	MCP2515_init();
+	volatile CAN_message *message;
+	unsigned short id = 2;
+	message->id = id;
+	message->length = 5;
+	for(int i=0; i<message->length; i++){
+		message->data[i] = 10+2*i;
+	}
+	volatile CAN_message *read_message;
+	CAN_transmit(message, 1);
+	_delay_ms(1000);
+	read_message = CAN_receive(1);
+	CAN_print(read_message);
 	while (1){
-		MCP2515_init(MODE_CONFIG);
+		menu_navigation();
+		
 	}
 }
 

@@ -139,7 +139,6 @@ void GUI_main_menu(uint8_t page,uint8_t back){
 		OLED_goto_pos(5,32);
 		OLED_print_string("See/reset hs");		
 		move_arrow(dir);
-		printf("PAGE=%d\n",page);
 	}
 }
 
@@ -181,7 +180,6 @@ void menu_navigation(){
 	 printf("node : %s, parent node: %s \n", title_1, title_1_p);*/
 	
 	joystick = get_joypos();
-	printf("-----------------------------------------------------------\n");
 	//printf("dir : %s\n",joystick.x_currdir);
 	if (curr_mode->title == "Main Menu"){
 		if(joystick.y_currdir == "DOWN" && curr_arrow_pos<END_MAIN_MENU){	
@@ -226,6 +224,7 @@ void menu_navigation(){
 			char * title = par_node->title;
 			char * title2 = get_current_node()->title;
 	//printf("parent: %s, current node: %s CURRENT ARROW=%d\n", title, title2,curr_arrow_pos);
+	_delay_ms(1000);
 }
 
 

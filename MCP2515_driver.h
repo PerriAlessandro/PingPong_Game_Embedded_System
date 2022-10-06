@@ -84,7 +84,6 @@ uint8_t MCP2515_init ()
 	
 	MCP2515_bit_modify(MCP_CANCTRL,MODE_MASK, MODE_LOOPBACK);
 	MCP2515_bit_modify(MCP_CANINTE, 0b00000011, 0b00000011);
-
-	printf("\n value = %d \n", value);
+	
 	return 0;
 }

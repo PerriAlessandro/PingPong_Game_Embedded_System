@@ -4,11 +4,12 @@ typedef struct{
 	unsigned short id;
 	unsigned char length;
 	char data [8];
-}can_message;
+}CAN_message;
 
-void can_transmit(struct can_message *message, uint8_t buffer){
-	uint8_t id_low = (message->id) << 5;
-	uint8_t id_high = (message->id) >> 3;
+void CAN_transmit(CAN_message *message, uint8_t buffer){
+	unsigned short id_low = (message->id & 7) << 5;
+	unsigned short id_high = (message->id) >> 3;
+	//printf("id low: %d\n", message->id);
 	uint8_t length = message->length;
 	uint8_t reg_high,reg_low,reg_dlc,reg_data,instr;
 
@@ -42,9 +43,9 @@ void can_transmit(struct can_message *message, uint8_t buffer){
 	MCP2515_request_to_send(instr);
 }
 
-struct can_message can_receive(uint8_t buffer){
-	struct can_message * new_message;
-	uint8_t intf = MCP2515_read(CANINTF)
+struct CAN_message *CAN_receive(uint8_t buffer){
+	CAN_message * new_message;
+	uint8_t intf = MCP2515_read(MCP_CANINTF); 
 	uint8_t int0 = (intf & 0b00000001);
 	uint8_t int1 = (intf & 0b00000010);
 	uint8_t reg_high,reg_low,reg_dlc,reg_data;
@@ -54,7 +55,7 @@ struct can_message can_receive(uint8_t buffer){
 		reg_low = MCP_RXB0SIDL;
 		reg_dlc = MCP_RXB0DLC;
 		reg_data = MCP_RXB0D0;
-		MCP2515_bit_modify(CANINTF, 0b00000001, 0x00);
+		MCP2515_bit_modify(MCP_CANINTF, 0b00000001, 0x00);
 		int1=1;
 	}
 	if(!int1){
@@ -62,13 +63,25 @@ struct can_message can_receive(uint8_t buffer){
 		reg_low = MCP_RXB1SIDL;
 		reg_dlc = MCP_RXB1DLC;
 		reg_data = MCP_RXB1D0;
-		MCP2515_bit_modify(CANINTF, 0b00000010, 0x00);
+		MCP2515_bit_modify(MCP_CANINTF, 0b00000010, 0x00);
 	}
 	if(!int0 | !int1){
-		new_message->id = MCP2515_read(reg_high) << 3 | (MCP2515_read(reg_low) >> 5);
-		new_message->length = read(reg_dlc);
+		unsigned short id = (MCP2515_read(reg_high) << 3) | (MCP2515_read(reg_low) >> 5);
+		new_message->id = id;
+		new_message->length = MCP2515_read(reg_dlc);
 		for(int i=0; i<new_message->length; i++){
 			new_message->data[i] = MCP2515_read(reg_data) +i;
 		}
 	}
+	return new_message;
+}
+
+void CAN_print(CAN_message *message){
+	printf("START CAN Message print.\n");
+	printf("ID: %d \n", message->id);
+	printf("Length: %d \n", message->length);
+	for(uint8_t i=0; i<message->length; i++){
+		printf("Package [%d]: %d \n", i, message->data[i]);
+	}
+	printf("END CAN Message print.\n\n");
 }
