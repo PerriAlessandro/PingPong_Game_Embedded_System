@@ -36,8 +36,39 @@ void can_transmit(struct can_message *message, uint8_t buffer){
 	MCP2515_write(reg_high, id_high);
 	MCP2515_write(reg_low, id_low);
 	MCP2515_write(reg_dlc, length);
-	for(int i=0; i<8; i++){
+	for(int i=0; i<length; i++){
 		MCP2515_write(reg_data +i, message->data[i]);
 	}
 	MCP2515_request_to_send(instr);
+}
+
+struct can_message can_receive(uint8_t buffer){
+	struct can_message * new_message;
+	uint8_t intf = MCP2515_read(CANINTF)
+	uint8_t int0 = (intf & 0b00000001);
+	uint8_t int1 = (intf & 0b00000010);
+	uint8_t reg_high,reg_low,reg_dlc,reg_data;
+
+	if(!int0){
+		reg_high = MCP_RXB0SIDH;
+		reg_low = MCP_RXB0SIDL;
+		reg_dlc = MCP_RXB0DLC;
+		reg_data = MCP_RXB0D0;
+		MCP2515_bit_modify(CANINTF, 0b00000001, 0x00);
+		int1=1;
+	}
+	if(!int1){
+		reg_high = MCP_RXB1SIDH;
+		reg_low = MCP_RXB1SIDL;
+		reg_dlc = MCP_RXB1DLC;
+		reg_data = MCP_RXB1D0;
+		MCP2515_bit_modify(CANINTF, 0b00000010, 0x00);
+	}
+	if(!int0 | !int1){
+		new_message->id = MCP2515_read(reg_high) << 3 | (MCP2515_read(reg_low) >> 5);
+		new_message->length = read(reg_dlc);
+		for(int i=0; i<new_message->length; i++){
+			new_message->data[i] = MCP2515_read(reg_data) +i;
+		}
+	}
 }

@@ -62,9 +62,14 @@ Copyright 2003 Kimberly Otten Software Consulting
 #define MCP_TXB2CTRL	0x50
 #define MCP_RXB0CTRL	0x60
 #define MCP_RXB0SIDH	0x61
+#define MCP_RXB0SIDL    0x62
+#define MCP_RXB0DLC     0x65
+#define MCP_RXB0D0      0x66
 #define MCP_RXB1CTRL	0x70
 #define MCP_RXB1SIDH	0x71
-
+#define MCP_RXB1SIDL    0x72
+#define MCP_RXB1DLC     0x75
+#define MCP_RXB1D0      0x76
 
 #define MCP_TX_INT		0x1C		// Enable all transmit interrupts
 #define MCP_TX01_INT	0x0C		// Enable TXB0 and TXB1 interrupts
@@ -170,7 +175,6 @@ Copyright 2003 Kimberly Otten Software Consulting
 #define TXB0D0 0x36
 #define TXB1D0 0x46
 #define TXB2D0 0x56
-
 
 
 
