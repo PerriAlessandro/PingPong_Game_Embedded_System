@@ -27,6 +27,16 @@ int main(){
 	OLED_clear();
 	GUI_menu_init();
 	MCP2515_init();
+
+	while (1){
+		menu_navigation();
+	}
+
+}
+
+
+/*
+
 	CAN_message message1,message2,message3;
 	CAN_message read_message1,read_message2,read_message3;
 	set_msg_id(&message1, 1);
@@ -54,7 +64,7 @@ int main(){
 	CAN_transmit(&message1, 0);
 	_delay_ms(1000);
 	CAN_receive(&read_message2);
-	uint8_t intf = MCP2515_read(MCP_CANINTF); 
+	uint8_t intf = MCP2515_read(MCP_CANINTF);
 	printf("INTF: %d\n", intf);
 	
 	_delay_ms(1000);
@@ -70,13 +80,8 @@ int main(){
 	CAN_print(&read_message1);
 	CAN_print(&read_message2);
 	//CAN_print(&read_message3);
-	while (1){
-		menu_navigation();
-	}
-
-}
 
 
-
+*/
 
 
