@@ -27,9 +27,18 @@ int main(){
 	OLED_clear();
 	GUI_menu_init();
 	MCP2515_init();
+	CAN_message message1, read_message1;
+	set_msg_id(&message1, 1);
+	set_msg_length(&message1,6);
+
 
 	while (1){
 		menu_navigation();
+		for(int i=0; i<message1.length; i++){
+			message1.data[i] = 4*i;
+		}
+		CAN_transmit(&message1, 0);
+		_delay_ms(1000);
 	}
 
 }
