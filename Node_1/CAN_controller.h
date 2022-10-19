@@ -1,4 +1,5 @@
 #include "mcp2515.h"
+#include "MCP2515_driver.h"
 
 typedef struct{
 	unsigned short id;
@@ -14,8 +15,6 @@ void set_msg_id(CAN_message * message , unsigned short message_id){
 void set_msg_length(CAN_message * message , unsigned char length){
 	message->length = length;
 }
-
-
 
 void CAN_transmit(CAN_message *message, uint8_t buffer){
 	uint8_t id_low = (message->id & 7) << 5;

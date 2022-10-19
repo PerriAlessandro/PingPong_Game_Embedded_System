@@ -6,12 +6,13 @@
 #include <avr/io.h>
 #include <avr/sleep.h>
 #include <util/delay.h>
+#include "CAN_controller.h"
 
 #define BASE_ADDRESS_ADC 0x1400
 
 struct joy_pos {   // Structure declaration
-  uint16_t x_pos;           
-  uint16_t y_pos;
+  uint8_t x_pos;           
+  uint8_t y_pos;
   const char* x_currdir;
   const char* y_currdir;         
 };
@@ -81,3 +82,34 @@ struct slider_pos get_sliderpos(){
 	return slider;			
 }
 
+void CAN_send_joypos(){
+	joystick = get_joypos();
+	CAN_message joystick_pos_msg;
+	
+	set_msg_id(&joystick_pos_msg ,1);
+	set_msg_length(&joystick_pos_msg, 4);
+	
+	
+	if (joystick.x_currdir =="LEFT"){
+		joystick_pos_msg.data[0] =-joystick.x_pos ;
+		joystick_pos_msg.data[1] =0 ;
+	}
+	else
+	{
+		joystick_pos_msg.data[0] =0 ;
+		joystick_pos_msg.data[1] = joystick.x_pos;
+	}
+	
+	if (joystick.y_currdir =="DOWN"){
+		joystick_pos_msg.data[2] =-joystick.y_pos ;
+		joystick_pos_msg.data[3] =0 ;
+	}
+	else
+	{
+		joystick_pos_msg.data[2] =0 ;
+		joystick_pos_msg.data[3] = joystick.y_pos;
+	}
+		
+	
+	CAN_transmit(&joystick_pos_msg,0);
+}

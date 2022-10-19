@@ -78,9 +78,11 @@ uint8_t MCP2515_init ()
 	}
 	
 	
-	MCP2515_bit_modify(MCP_CNF1, 0b11111111, 0b00000010); //Length=1TQ, BRP=1
-	MCP2515_bit_modify(MCP_CNF2, 0b11111111, 0b10110001); //PS2 in set further, 1 sample point, PS1=7TQ, PropSeg=2TQ
 	MCP2515_bit_modify(MCP_CNF3, 0b11111111, 0b00000101); //??, ??, Nothing, PS2=6TQ
+	MCP2515_bit_modify(MCP_CNF2, 0b11111111, 0b10110001); //PS2, 1 sample point, PS1=7TQ, PropSeg=2TQ
+	MCP2515_bit_modify(MCP_CNF1, 0b11111111, 0b00000011); //Length=1TQ, BRP=1
+	
+	
 	
 	MCP2515_bit_modify(MCP_CANCTRL,MODE_MASK, MODE_NORMAL);
 	MCP2515_bit_modify(MCP_CANINTE, 0b00000011, 0b00000011);
