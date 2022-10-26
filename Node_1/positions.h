@@ -113,3 +113,16 @@ void CAN_send_joypos(){
 	
 	CAN_transmit(&joystick_pos_msg,0);
 }
+
+void CAN_send_slider(){
+	slider = get_sliderpos();
+	CAN_message slider_pos_msg;
+	
+	set_msg_id(&slider_pos_msg ,1);
+	set_msg_length(&slider_pos_msg, 2);
+	
+	slider_pos_msg.data[0] =slider.left;
+	slider_pos_msg.data[1] =slider.right;
+	
+	CAN_transmit(&slider_pos_msg,0);
+}

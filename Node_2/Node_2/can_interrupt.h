@@ -8,10 +8,13 @@
  *
  */ 
 
+#include "CAN_controller.h"
+
 
 #ifndef CAN_INTERRUPT_H_
 #define CAN_INTERRUPT_H_
 void CAN0_Handler       ( void );
+void CAN_message_get(CAN_MESSAGE pass_message);
 
 
 

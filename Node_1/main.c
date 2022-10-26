@@ -30,7 +30,7 @@ int main(){
 
 	while (1){
 		menu_navigation();
-		CAN_send_joypos();
+		CAN_send_slider();
 		
 		_delay_ms(1000);
 	}
