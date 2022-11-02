@@ -9,9 +9,13 @@
 #include "printf-stdarg.h"
 #include "sam.h"
 #include "can_controller.h"
-//#include "can_interrupt.h"
 #include "pwm.h"
 #include "motor.h"
+#include "timer.h"
+#include "DAC.h"
+
+#define SCORE_CAN_ID 2
+#define SCORE_CAN_DATA_LENGTH 1
 
 void CAN_print(CAN_MESSAGE *message){
 
@@ -25,37 +29,32 @@ for(uint8_t i=0; i<(uint8_t)(message->data_length); i++){
 }
 printf("END CAN Message print. \n \r")	;
 }
-
+uint32_t clk_value=0;
 int main(void)
 {
     /* Initialize the SAM system */
     SystemInit();
 	configure_uart();
 	pwn_init();
-	uint8_t PHASE_2 = 5;
-	uint8_t PHASE_1 = 6;
-	uint8_t PROPAG = 1;
-	uint8_t SJW = 0;
-	uint8_t BRP = 41;
-	uint8_t SMP = 0;
-	uint32_t can_br = PHASE_2 | (PHASE_1 << 4) | (PROPAG << 8) | (SJW << 12) | (BRP << 16) | (SMP << 24);
-	
-	uint8_t old_value = 0;
-	uint8_t new_value = 1;
-	can_init_def_tx_rx_mb(can_br);
+	can_init_def_tx_rx_mb(get_can_br());
 	servo_init();
-	CAN_MESSAGE message;
-    while (1){
-		
-		//CAN_print(&message);
-		can_receive(&message, 0);
-		if(old_value != new_value){
-			 pwm_set_dutycycle(&message);
-			 old_value = new_value;
-		}
-		new_value = message.data[1];
-		send_score();
+	motor_init();
+	DAC_init();
+	CAN_MESSAGE score_message;
+	score_message.id=SCORE_CAN_ID;
+	score_message.data_length=SCORE_CAN_DATA_LENGTH;
 	
+	printf("START GAME\n\r");
+    while (1){
+		DAC_write(1000);
+		if (game_is_over()){	
+			clk_value=read_value_timer();
+			printf("Your score is: %d\n\r",clk_value);
+			score_message.data[0]=clk_value;
+			can_send(&score_message,0);
+			reset_timer();	
+		}
+		
 	}
 	
 }

@@ -14,6 +14,14 @@
 
 #include "printf-stdarg.h"
 
+#define PHASE_2  5
+#define PHASE_1  6
+#define PROPAG 1
+#define SJW  0
+#define BRP  41
+#define SMP  0
+
+
 
 /**
  * \brief Initialize can bus with predefined number of rx and tx mailboxes, 
@@ -131,6 +139,7 @@ uint8_t can_send(CAN_MESSAGE* can_msg, uint8_t tx_mb_id)
 {
 	//Check that mailbox is ready
 	if(CAN0->CAN_MB[tx_mb_id].CAN_MSR & CAN_MSR_MRDY)
+	
 	{
 		//Set message ID and use CAN 2.0B protocol
 		CAN0->CAN_MB[tx_mb_id].CAN_MID = CAN_MID_MIDvA(can_msg->id) | CAN_MID_MIDE ;
@@ -204,5 +213,12 @@ uint8_t can_receive(CAN_MESSAGE* can_msg, uint8_t rx_mb_id)
 	{
 		return 1;
 	}
+}
+
+uint32_t get_can_br(){
+	
+	uint32_t can_br = PHASE_2 | (PHASE_1 << 4) | (PROPAG << 8) | (SJW << 12) | (BRP << 16) | (SMP << 24);
+	return can_br;
+	
 }
 

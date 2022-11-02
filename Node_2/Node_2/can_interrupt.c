@@ -18,6 +18,7 @@
 #include "can_controller.h"
 
 #define DEBUG_INTERRUPT 1
+#define SLIDER_CAN_ID 1
 
 /**
  * \brief CAN0 Interrupt handler for RX, TX and bus error interrupts
@@ -40,6 +41,10 @@ void CAN0_Handler( void )
 		if(can_sr & CAN_SR_MB1)  //Mailbox 1 event
 		{
 			can_receive(&message, 1);
+			if (message.id==SLIDER_CAN_ID){
+				pwm_set_dutycycle(&message);
+			}
+			
 
 		}
 		else if(can_sr & CAN_SR_MB2) //Mailbox 2 event

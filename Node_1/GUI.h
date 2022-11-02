@@ -24,6 +24,7 @@ node* curr_mode;
 uint8_t curr_arrow_pos=0;
 uint8_t value;
 uint8_t flag = 0;
+uint8_t highscore=0;
 
 volatile node* main_menu;
 volatile node* play;
@@ -32,6 +33,10 @@ volatile node* calibrate;
 volatile node* set_diff;
 volatile node* quit;
 
+
+void display_highscore(uint8_t hs){	
+	highscore=hs;	
+}
 
 void set_current_node(node*n){
 	curr_mode=n;
@@ -62,7 +67,9 @@ void f_play(){
 void f_sr_highscore(){
 	OLED_clear();
 	OLED_goto_pos(3,32);
-	OLED_print_string("highscore");
+	char hs[20];
+	sprintf(hs,"HS: %d",highscore);
+	OLED_print_string(hs);
 }
 
 void f_calibrate(){

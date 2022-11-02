@@ -82,6 +82,8 @@ struct slider_pos get_sliderpos(){
 	return slider;			
 }
 
+
+//unused
 void CAN_send_joypos(){
 	joystick = get_joypos();
 	CAN_message joystick_pos_msg;

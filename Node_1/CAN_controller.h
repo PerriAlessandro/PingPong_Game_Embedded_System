@@ -58,16 +58,16 @@ void CAN_receive(CAN_message* new_message){
 	uint8_t intf = MCP2515_read(MCP_CANINTF); 
 	//printf("canintf: %d\n\n", intf);
 	uint8_t int0 = (intf & MCP_RX0IF);
-	//uint8_t int1 = (intf & MCP_RX1IF);
+	uint8_t int1 = (intf & MCP_RX1IF);
 	uint8_t reg_high,reg_low,reg_dlc,reg_data;
 
-	if(int0){
-		reg_high = MCP_RXB0SIDH;
-		reg_low = MCP_RXB0SIDL;
-		reg_dlc = MCP_RXB0DLC;
-		reg_data = MCP_RXB0D0;
+	if(int1){
+		reg_high = MCP_RXB1SIDH;
+		reg_low = MCP_RXB1SIDL;
+		reg_dlc = MCP_RXB1DLC;
+		reg_data = MCP_RXB1D0;
 
-		MCP2515_bit_modify(MCP_CANINTF, MCP_RX0IF, 0x00);
+		MCP2515_bit_modify(MCP_CANINTF, MCP_RX1IF, 0x00);
 
 		//int1=0;
 	}
@@ -79,7 +79,7 @@ void CAN_receive(CAN_message* new_message){
 		MCP2515_bit_modify(MCP_CANINTF, MCP_RX1IF, 0x00);
 	}*/
 
-	if(int0){
+	if(int1){
 		uint8_t id_high=MCP2515_read(reg_high) << 3;
 		uint8_t id_low=MCP2515_read(reg_low) >> 5;
 		unsigned short id = (id_high | id_low);
@@ -91,6 +91,7 @@ void CAN_receive(CAN_message* new_message){
 		}
 	//printf("ID from receive: %d,id low: %d, id high: %d",id,(id_low<<5),(id_high>>3));
 	}
+
 }
 
 void CAN_print(CAN_message *message){
