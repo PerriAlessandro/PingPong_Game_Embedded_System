@@ -13,23 +13,15 @@
 #include "motor.h"
 #include "timer.h"
 #include "DAC.h"
+#include "PID.h"
 
 #define SCORE_CAN_ID 2
 #define SCORE_CAN_DATA_LENGTH 1
 
-void CAN_print(CAN_MESSAGE *message){
 
-printf("START CAN Message print. \n \r")	;
-printf("ID: %d \n \r",message->id);
-printf("Length: %d \n \r",message->data_length)	;
-for(uint8_t i=0; i<(uint8_t)(message->data_length); i++){
-	
-	printf("Package [%d]: %d \n \r", i, message->data[i])	;
-	
-}
-printf("END CAN Message print. \n \r")	;
-}
 uint32_t clk_value=0;
+static PID_t PID;
+
 int main(void)
 {
     /* Initialize the SAM system */
@@ -40,13 +32,15 @@ int main(void)
 	servo_init();
 	motor_init();
 	DAC_init();
+	PID_init(&PID,K_P,K_I,K_D, T);
 	CAN_MESSAGE score_message;
 	score_message.id=SCORE_CAN_ID;
 	score_message.data_length=SCORE_CAN_DATA_LENGTH;
-	
+
+	DAC_write(1000);
 	printf("START GAME\n\r");
     while (1){
-		DAC_write(1000);
+		
 		if (game_is_over()){	
 			clk_value=read_value_timer();
 			printf("Your score is: %d\n\r",clk_value);
