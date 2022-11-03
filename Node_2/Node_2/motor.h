@@ -1,13 +1,34 @@
+#define DIR  PIO_PD10
+#define EN   PIO_PD9
+#define SEL  PIO_PD2
+#define NOT_RST  PIO_PD1
+#define NOT_OE   PIO_PD0
+#define ENC_MSK  0x1FE
+
 uint8_t game_over=0;
 uint8_t start_game=1;
 
 void motor_init(){
-	REG_PIOD_PER=PIO_PER_P0 || PIO_PER_P1 || PIO_PER_P2 || PIO_PER_P9 || PIO_PER_P10; //PIO Controller PIO Enable Register
-	REG_PIOD_OER=PIO_OER_P0 || PIO_OER_P1 || PIO_OER_P2 || PIO_OER_P9 || PIO_OER_P10; //PIO Controller PIO Output Enable Register
+	REG_PIOD_PER= NOT_OE || NOT_RST || SEL || EN || DIR  ; //PIO Controller PIO Enable Register
+	REG_PIOD_OER= NOT_OE || NOT_RST || SEL || EN || DIR  ; //PIO Controller PIO Output Enable Register
 	
-	REG_PIOD_SODR= PIO_SODR_P1 || PIO_SODR_P9; //PIO Controller Set Output Data Register, not encoder reset (P1) ,encoder mj1 enable high(P10)
-	REG_PIOD_CODR = PIO_CODR_P0 || PIO_CODR_P2 || PIO_CODR_P10; //PIO Controller Clear Output Data Register,encoder output enable (P0), encoder select(P2) ,mj1 set dir(P10)
+	REG_PIOD_SODR= NOT_RST || EN; //PIO Controller Set Output Data Register, not encoder reset (P1) ,encoder mj1 enable high(P10)
+	REG_PIOD_CODR = NOT_OE || SEL || DIR; //PIO Controller Clear Output Data Register,encoder output enable (P0), encoder select(P2) ,mj1 set dir(P10)
 	
+}
+
+uint16_t read_encoder(){
+	
+	REG_PIOD_CODR=REG_PIOD_CODR = NOT_OE || SEL ; //set !OE and SEL low
+	_delay_us(20); //Wait approx. 20 microseconds for output to settle
+	uint8_t high_byte  = (REG_PIOC_PDSR & ENC_MSK)>>1; // Read MJ2 to get high byte
+	REG_PIOD_SODR= SEL; //Set SEL high to output low byte	_delay_us(20);
+	uint8_t low_byte = (REG_PIOC_PDSR & ENC_MSK)>>1; // Read MJ2 to get low byte
+	REG_PIOD_CODR=REG_PIOD_SODR = NOT_OE; //Set !OE to high	uint16_t enc_value= high_byte<<8 || low_byte;	return enc_value;
+}
+
+void reset_encoder(){
+	REG_PIOD_CODR= NOT_RST;
 }
 
 void servo_init(){
