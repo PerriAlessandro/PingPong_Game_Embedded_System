@@ -19,6 +19,8 @@ node* new_node(char* name, node* parent) {
 
 #define N_NODES 4
 #define END_MAIN_MENU 4
+#define PLAY_ID 5
+#define QUIT_ID 6
 
 node* curr_mode;
 uint8_t curr_arrow_pos=0;
@@ -32,6 +34,8 @@ volatile node* sr_highscore;
 volatile node* calibrate;
 volatile node* set_diff;
 volatile node* quit;
+
+
 
 
 void display_highscore(uint8_t hs){	
@@ -61,7 +65,14 @@ void set_fun(node* n, void (* fun_ptr)(void)){
 void f_play(){
 	OLED_clear();
 	OLED_goto_pos(3,32);
-	OLED_print_string("Play");
+	CAN_message msg;
+	
+	set_msg_id(&msg ,PLAY_ID);
+	set_msg_length(&msg, 1);
+	msg.data[0] = 1;
+	CAN_transmit(&msg,0);
+	
+	OLED_print_string("Playing");
 }
 
 void f_sr_highscore(){
@@ -154,7 +165,7 @@ void GUI_menu_init(){
 	main_menu= new_node("Main Menu", NULL);
 	curr_mode= main_menu;
 	play= new_node("Play", main_menu);
-	sr_highscore= new_node("See/Reset Highscore", main_menu);
+	sr_highscore= new_node("See Highscore", main_menu);
 	calibrate= new_node("Calibrate", main_menu);
 	set_diff= new_node("Set Difficulty", main_menu);
 	quit= new_node("Quit", main_menu);
@@ -228,11 +239,11 @@ void menu_navigation(){
 	}
 	//printf("%s\n",play->title);
 	node * par_node = (get_current_node()->parent);
-			char * title = par_node->title;
-			char * title2 = get_current_node()->title;
+	char * title = par_node->title;
+	char * title2 = get_current_node()->title;
 	//printf("parent: %s, current node: %s CURRENT ARROW=%d\n", title, title2,curr_arrow_pos);
 	_delay_ms(1000);
 }
 
 
-	//value = PINB;	
+

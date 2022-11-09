@@ -19,6 +19,7 @@
 
 #define DEBUG_INTERRUPT 1
 #define SLIDER_CAN_ID 1
+#define PLAY_CAN_ID 5
 
 /**
  * \brief CAN0 Interrupt handler for RX, TX and bus error interrupts
@@ -29,10 +30,11 @@
  */
 
 CAN_MESSAGE message;
+uint8_t playing =0;
 
 void CAN0_Handler( void )
 {
-	if(DEBUG_INTERRUPT)printf("CAN0 interrupt\n\r");
+	//if(DEBUG_INTERRUPT)printf("CAN0 interrupt\n\r");
 	char can_sr = CAN0->CAN_SR; 
 	
 	//RX interrupt
@@ -40,10 +42,15 @@ void CAN0_Handler( void )
 	{
 		if(can_sr & CAN_SR_MB1)  //Mailbox 1 event
 		{
-			can_receive(&message, 1);
-			if (message.id==SLIDER_CAN_ID){
-				pwm_set_dutycycle(&message);
+			can_receive(&message, 1);			
+			if (message.id==PLAY_CAN_ID){
+				playing=1;
 			}
+			if (message.id==SLIDER_CAN_ID && playing){
+				pwm_set_dutycycle(&message);
+				set_motor_pos(message.data[0]);
+			}
+
 			
 
 		}
@@ -57,18 +64,18 @@ void CAN0_Handler( void )
 			printf("CAN0 message arrived in non-used mailbox\n\r");
 		}
 
-		if(DEBUG_INTERRUPT)printf("message id: %d\n\r", message.id);
-		if(DEBUG_INTERRUPT)printf("message data length: %d\n\r", message.data_length);
+		//(DEBUG_INTERRUPT)printf("message id: %d\n\r", message.id);
+		//(DEBUG_INTERRUPT)printf("message data length: %d\n\r", message.data_length);
 		for (int i = 0; i < message.data_length; i++)
 		{
-			if(DEBUG_INTERRUPT)printf("%d ", message.data[i]);
+			//(DEBUG_INTERRUPT)printf("%d ", message.data[i]);
 		}
-		if(DEBUG_INTERRUPT)printf("\n\r");
+		//(DEBUG_INTERRUPT)printf("\n\r");
 	}
 	
 	if(can_sr & CAN_SR_MB0)
 	{
-		if(DEBUG_INTERRUPT) printf("CAN0 MB0 ready to send \n\r");
+		//if(DEBUG_INTERRUPT) printf("CAN0 MB0 ready to send \n\r");
 		
 	//Disable interrupt
 		CAN0->CAN_IDR = CAN_IER_MB0;
@@ -98,4 +105,12 @@ void CAN_message_get(CAN_MESSAGE pass_message){
 		pass_message.data[i] = message.data[i];
 		
 	}
+}
+
+void infrared_interrupt(){
+	playing = 0;
+}
+
+void print_status_play(){
+	printf("Situation: %d \n\r", playing);
 }

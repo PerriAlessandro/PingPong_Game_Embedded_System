@@ -4,66 +4,90 @@
 #define NOT_RST  PIO_PD1
 #define NOT_OE   PIO_PD0
 #define ENC_MSK  0x1FE
-#define MAX_MOTOR_SPEED 100
+#define ENC_MIN 0
+#define ENC_MAX 8500
+#define MAX_MOTOR_SPEED 1500
+#define MIN_MOTOR_SPEED 1000
 
 uint8_t game_over=0;
 
+static PID_t PID;
 
 void motor_init(){
+	REG_PMC_PCR= PMC_PCR_EN | PMC_PCR_DIV_PERIPH_DIV_MCK | (ID_PIOC << PMC_PCR_PID_Pos);
+	REG_PMC_PCER0 |= 1<<ID_PIOC;
 	REG_PIOC_PER = PIO_PC1 | PIO_PC2 | PIO_PC3 | PIO_PC4 | PIO_PC5 | PIO_PC6 | PIO_PC7 | PIO_PC8;
+	REG_PIOC_ODR = PIO_PC1 | PIO_PC2 | PIO_PC3 | PIO_PC4 | PIO_PC5 | PIO_PC6 | PIO_PC7 | PIO_PC8;
 	
 	REG_PIOD_PER= NOT_OE | NOT_RST | SEL | EN | DIR  ; //PIO Controller PIO Enable Register
 	REG_PIOD_OER= NOT_OE | NOT_RST | SEL | EN | DIR  ; //PIO Controller PIO Output Enable Register
 	
 	REG_PIOD_SODR= NOT_RST | EN; //PIO Controller Set Output Data Register, not encoder reset (P1) ,encoder mj1 enable high(P10)
 	REG_PIOD_CODR = NOT_OE | SEL | DIR; //PIO Controller Clear Output Data Register,encoder output enable (P0), encoder select(P2) ,mj1 set dir(P10)
+	reset_encoder();
 	
 	
 }
 
 uint16_t read_encoder(){
-	
-	REG_PIOD_CODR=REG_PIOD_CODR = NOT_OE || SEL ; //set !OE and SEL low
-	delay_us(20); //Wait approx. 20 microseconds for output to settle
+	REG_PIOD_CODR=REG_PIOD_CODR = NOT_OE | SEL ; //set !OE and SEL low
+	delay_us(200); //Wait approx. 20 microseconds for output to settle
 	uint8_t high_byte  = (REG_PIOC_PDSR & ENC_MSK)>>1; // Read MJ2 to get high byte
-	REG_PIOD_SODR= SEL; //Set SEL high to output low byte	delay_us(20);
+	REG_PIOD_SODR= SEL; //Set SEL high to output low byte	delay_us(200);
 	uint8_t low_byte = (REG_PIOC_PDSR & ENC_MSK)>>1; // Read MJ2 to get low byte
-	REG_PIOD_CODR=REG_PIOD_SODR = NOT_OE; //Set !OE to high	uint16_t enc_value= high_byte<<8 || low_byte;	return enc_value;
+	//reset_encoder();
+	REG_PIOD_SODR = NOT_OE; //Set !OE to high	//printf("h: %d, l:%d\n\r",high_byte,low_byte);	uint16_t enc_value= high_byte << 8 | low_byte;	if (enc_value & (1 << 15)) {
+        return ((uint16_t) (~enc_value) + 1);
+    }	return enc_value;
 }
+
+
+
 
 void set_motor_pos(uint16_t des_pos){
 	
-	uint16_t curr_pos = read_encoder(); //to be scaled yet
+	uint16_t curr_pos = read_encoder();
+	
+	des_pos=map(des_pos,0,100,ENC_MIN,ENC_MAX);
+	
 	uint16_t u=0;
-	uint16_t err=0;
-	while(curr_pos!=des_pos){
+	int err=curr_pos-des_pos;
+	//printf("curr_pos: %d, des: %d, error: %d\n\r",curr_pos,des_pos, err);
+	//while(curr_pos!=des_pos){
+	//while(!((des_pos-500)<curr_pos && curr_pos<(des_pos+500))){
+	//while(!(-500<err && err<500)){
+	
 		err=curr_pos-des_pos;
+
 		u=PID_controller(&PID,curr_pos,des_pos);
 		
 		if(u>MAX_MOTOR_SPEED){
 			u=MAX_MOTOR_SPEED;	
 		}
-		else if (u<-MAX_MOTOR_SPEED){
-			u=-MAX_MOTOR_SPEED;	
-		}
-		
+		/*if(u<MIN_MOTOR_SPEED){
+			u=MIN_MOTOR_SPEED;	
+		}*/
+		//printf("curr: %d,err: %d,u:%d\n\r",curr_pos,err,u);
 		if (err>0){//LEFT
 			REG_PIOD_CODR =  DIR;
-			DAC_write(u);
 		}
 		else if (err<0){ //RIGHT
 			REG_PIOD_SODR =  DIR;
-			DAC_write(-u);	
 		}
-	curr_pos = read_encoder(); //to be scaled yet	
+		DAC_write(u);
+		//curr_pos = read_encoder(); 	
 	
-	}
+	//}
 	
 }
 
 void reset_encoder(){
 	REG_PIOD_CODR= NOT_RST;
+	delay_us(20);
+	REG_PIOD_SODR= NOT_RST;
 }
+
+
 
 
 
@@ -97,10 +121,10 @@ void reset_timer(){
 	 
 	uint32_t status=REG_PIOC_ISR;
 	 if(status & PIO_ISR_P16){
-			//printf("interrupt captured\n\r");
+			printf("interrupt captured\n\r");
 			game_over= 1;
 		}
-	 
+	infrared_interrupt();
  }
  
  

@@ -37,7 +37,6 @@ int main(){
 			display_highscore(score_message.data[0]);
 			printf("highscore received: %d\n\r",score_message.data[0]);
 			score_message.id=99;
-		
 		}
 		_delay_ms(1000);
 	}

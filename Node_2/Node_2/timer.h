@@ -12,5 +12,5 @@ uint32_t read_value_timer(){
 
 
 void delay_us(uint16_t val){
-	for (uint16_t i=0;i<val;i++)	asm("NOP");
+	for (uint16_t i=0;i<val;i++) asm("NOP");
 }
