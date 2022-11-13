@@ -23,7 +23,7 @@ main.d main.o: .././main.c \
  .././CAN_controller.h .././mcp2515.h .././MCP2515_driver.h .././SPI.h \
  .././OLED.h .././fonts.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\pgmspace.h \
- .././GUI.h
+ .././GUI.h .././play.h
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h:
 
@@ -88,3 +88,5 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\pgmspace.h:
 
 .././GUI.h:
+
+.././play.h:

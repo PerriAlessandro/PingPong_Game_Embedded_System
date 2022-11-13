@@ -84,7 +84,6 @@ void check_game(CAN_message * score_message)
 void f_play(){
 	OLED_clear();
 	OLED_goto_pos(3,32);
-	printf("a");
 	if(!playing){
 		CAN_message msg;
 		set_msg_id(&msg ,PLAY_CAN_ID);

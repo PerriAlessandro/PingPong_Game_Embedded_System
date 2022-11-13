@@ -13,6 +13,7 @@
 #include "positions.h"
 #include "OLED.h"
 #include "GUI.h"
+#include "play.h"
 
 
 
@@ -27,14 +28,9 @@ int main(){
 	GUI_menu_init();
 	MCP2515_init();
 	button_init();
-	printf("START NODE 1\n\r");
-	CAN_message score_message;
+	play_init();
 	while (1){
-		menu_navigation();
-		CAN_send_slider();
-		CAN_receive(&score_message);
-		check_game(&score_message);
-		_delay_ms(1000);
+		routine();
 	}
 
 }
