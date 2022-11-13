@@ -20,6 +20,7 @@
 #define DEBUG_INTERRUPT 1
 #define SLIDER_CAN_ID 1
 #define PLAY_CAN_ID 5
+#define STOP_CAN_ID 6
 
 /**
  * \brief CAN0 Interrupt handler for RX, TX and bus error interrupts
@@ -45,10 +46,22 @@ void CAN0_Handler( void )
 			can_receive(&message, 1);			
 			if (message.id==PLAY_CAN_ID){
 				playing=1;
+				start_timer();
+			}
+			if (message.id==STOP_CAN_ID){
+				playing=0;
 			}
 			if (message.id==SLIDER_CAN_ID && playing){
 				pwm_set_dutycycle(&message);
 				set_motor_pos(message.data[0]);
+				if(message.data[2]){
+					set_solenoid();
+				}
+					
+				else {
+					clear_solenoid();
+				}
+					
 			}
 
 			

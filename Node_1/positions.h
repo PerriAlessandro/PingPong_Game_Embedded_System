@@ -116,15 +116,30 @@ void CAN_send_joypos(){
 	CAN_transmit(&joystick_pos_msg,0);
 }
 
+void button_init(){
+	PORTB= 1<<PB0;
+	DDRB &= ~(1<< DDB0);
+	
+}
+
+uint8_t button_status(){
+
+	uint8_t value=PINB & 0x1;
+	return value;	
+}
+
 void CAN_send_slider(){
 	slider = get_sliderpos();
+	uint8_t button=button_status();
+
 	CAN_message slider_pos_msg;
 	
 	set_msg_id(&slider_pos_msg ,1);
-	set_msg_length(&slider_pos_msg, 2);
+	set_msg_length(&slider_pos_msg, 3);
 	
 	slider_pos_msg.data[0] =slider.left;
 	slider_pos_msg.data[1] =slider.right;
+	slider_pos_msg.data[2] =button;
 	
 	CAN_transmit(&slider_pos_msg,0);
 }

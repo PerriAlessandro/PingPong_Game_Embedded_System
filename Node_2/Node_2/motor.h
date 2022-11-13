@@ -16,7 +16,7 @@ static PID_t PID;
 void motor_init(){
 	REG_PMC_PCR= PMC_PCR_EN | PMC_PCR_DIV_PERIPH_DIV_MCK | (ID_PIOC << PMC_PCR_PID_Pos);
 	REG_PMC_PCER0 |= 1<<ID_PIOC;
-	REG_PIOC_PER = PIO_PC1 | PIO_PC2 | PIO_PC3 | PIO_PC4 | PIO_PC5 | PIO_PC6 | PIO_PC7 | PIO_PC8;
+	REG_PIOC_PER = PIO_PC1 | PIO_PC2 | PIO_PC3 | PIO_PC4 | PIO_PC5 | PIO_PC6 | PIO_PC7 | PIO_PC8 ;
 	REG_PIOC_ODR = PIO_PC1 | PIO_PC2 | PIO_PC3 | PIO_PC4 | PIO_PC5 | PIO_PC6 | PIO_PC7 | PIO_PC8;
 	
 	REG_PIOD_PER= NOT_OE | NOT_RST | SEL | EN | DIR  ; //PIO Controller PIO Enable Register
@@ -92,7 +92,7 @@ void reset_encoder(){
 
 
 
-void servo_init(){
+void int_servo_init(){
 	REG_PIOC_PER=PIO_PER_P16; ////PIO Controller PIO Enable Register
 	PIOC->PIO_ODR=PIO_ODR_P16; //PIO Controller Output Disable Register
 	PIOC->PIO_PUDR=PIO_PUDR_P16; //PIO Pull Up Disable Register
@@ -107,15 +107,14 @@ void servo_init(){
 	NVIC_EnableIRQ(PIOC_IRQn);		
 }
 
-uint8_t game_is_over(){
+uint8_t is_game_over(){
 	return game_over;
 }
 
-void reset_timer(){
+void finish_game(){
 	game_over=0;
-	start_timer();
-	
 }
+
 
  void PIOC_Handler(){
 	 

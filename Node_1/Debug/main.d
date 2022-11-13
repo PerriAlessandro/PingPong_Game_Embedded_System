@@ -19,9 +19,9 @@ main.d main.o: .././main.c \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h \
- .././Uart_driver.h .././usart_driver.h .././xmem_driver.h .././ADC.h \
- .././positions.h .././CAN_controller.h .././mcp2515.h \
- .././MCP2515_driver.h .././SPI.h .././OLED.h .././fonts.h \
+ .././usart_driver.h .././xmem_driver.h .././ADC.h .././positions.h \
+ .././CAN_controller.h .././mcp2515.h .././MCP2515_driver.h .././SPI.h \
+ .././OLED.h .././fonts.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\pgmspace.h \
  .././GUI.h
 
@@ -64,8 +64,6 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h:
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h:
-
-.././Uart_driver.h:
 
 .././usart_driver.h:
 

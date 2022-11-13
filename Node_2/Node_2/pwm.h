@@ -3,7 +3,7 @@ uint16_t map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uin
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-void pwn_init(){
+void pwm_init(){
 	REG_PWM_CLK=PWM_CLK_PREA(0)|PWM_CLK_DIVA(200); //84 Mhz /200
 	PMC->PMC_PCER1|=(1<<4); // Peripheral Clock Enable 1
 	REG_PIOC_PDR|=PIO_PDR_P19;

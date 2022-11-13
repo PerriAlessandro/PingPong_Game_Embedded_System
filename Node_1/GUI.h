@@ -19,14 +19,17 @@ node* new_node(char* name, node* parent) {
 
 #define N_NODES 4
 #define END_MAIN_MENU 4
-#define PLAY_ID 5
-#define QUIT_ID 6
+#define SCORE_CAN_ID 2
+#define PLAY_CAN_ID 5
+#define STOP_PLAY_CAN_ID 6
+
 
 node* curr_mode;
 uint8_t curr_arrow_pos=0;
 uint8_t value;
 uint8_t flag = 0;
 uint8_t highscore=0;
+uint8_t playing=0;
 
 volatile node* main_menu;
 volatile node* play;
@@ -39,7 +42,11 @@ volatile node* quit;
 
 
 void display_highscore(uint8_t hs){	
-	highscore=hs;	
+	
+	if(hs>highscore){
+		highscore=hs;
+	}
+		
 }
 
 void set_current_node(node*n){
@@ -62,16 +69,31 @@ void set_fun(node* n, void (* fun_ptr)(void)){
 }
 
 
+void check_game(CAN_message * score_message)
+{
+	if (score_message->id==SCORE_CAN_ID){
+		display_highscore(score_message->data[0]);
+		printf("highscore received: %d\n\r",score_message->data[0]);
+		score_message->id=99;
+		set_current_node(get_current_node()->parent);
+		GUI_main_menu();
+		playing=0;
+	}
+}
+
 void f_play(){
 	OLED_clear();
 	OLED_goto_pos(3,32);
-	CAN_message msg;
-	
-	set_msg_id(&msg ,PLAY_ID);
-	set_msg_length(&msg, 1);
-	msg.data[0] = 1;
-	CAN_transmit(&msg,0);
-	
+	printf("a");
+	if(!playing){
+		CAN_message msg;
+		set_msg_id(&msg ,PLAY_CAN_ID);
+		set_msg_length(&msg, 1);
+		msg.data[0] = 1;
+		CAN_transmit(&msg,0);	
+		playing=1;
+	}
+
 	OLED_print_string("Playing");
 }
 
@@ -132,6 +154,13 @@ void GUI_main_menu(uint8_t page,uint8_t back){
 	OLED_goto_pos(1,8);
 	OLED_print_string("PING PONG GAME");
 	uint8_t dir;
+	
+	CAN_message msg;
+	set_msg_id(&msg ,STOP_PLAY_CAN_ID);
+	set_msg_length(&msg, 1);
+	msg.data[0] = 1;
+	CAN_transmit(&msg,0);	
+	
 	if (back==0)
 	dir=curr_arrow_pos%2; 
 	else 
