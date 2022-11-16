@@ -21,7 +21,6 @@ void CAN_transmit(CAN_message *message, uint8_t buffer){
 	uint8_t id_high = (message->id) >> 3;
 	uint8_t length = message->length;
 	uint8_t reg_high,reg_low,reg_dlc,reg_data,instr;
-	//printf("ID from transmit: %d, low %d, high %d\n",message->id,id_low,id_high);
 
 	if(buffer == 0){
 		reg_high=TXB0SIDH;
@@ -56,7 +55,6 @@ void CAN_transmit(CAN_message *message, uint8_t buffer){
 void CAN_receive(CAN_message* new_message){
 	
 	uint8_t intf = MCP2515_read(MCP_CANINTF); 
-	//printf("canintf: %d\n\n", intf);
 	uint8_t int0 = (intf & MCP_RX0IF);
 	uint8_t int1 = (intf & MCP_RX1IF);
 	uint8_t reg_high,reg_low,reg_dlc,reg_data;

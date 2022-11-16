@@ -18,7 +18,8 @@
 #include "can_controller.h"
 
 #define DEBUG_INTERRUPT 1
-#define SLIDER_CAN_ID 1
+#define SLIDER_CAN_ID 3
+#define JOYSTICK_CAN_ID 1
 #define PLAY_CAN_ID 5
 #define STOP_CAN_ID 6
 
@@ -52,7 +53,7 @@ void CAN0_Handler( void )
 				playing=0;
 			}
 			if (message.id==SLIDER_CAN_ID && playing){
-				pwm_set_dutycycle(&message);
+				pwm_set_dutycycle(message.data[1]);
 				set_motor_pos(message.data[0]);
 				if(message.data[2]){
 					set_solenoid();
@@ -61,6 +62,17 @@ void CAN0_Handler( void )
 				else {
 					clear_solenoid();
 				}
+			}
+		if (message.id==JOYSTICK_CAN_ID && playing){
+			pwm_set_dutycycle(message.data[4]);
+			set_motor_pos_joystick(message.data[0],message.data[2]);
+			if(message.data[3]){
+				set_solenoid();
+			}
+					
+			else {
+				clear_solenoid();
+			}
 					
 			}
 
@@ -122,8 +134,4 @@ void CAN_message_get(CAN_MESSAGE pass_message){
 
 void infrared_interrupt(){
 	playing = 0;
-}
-
-void print_status_play(){
-	printf("Situation: %d \n\r", playing);
 }

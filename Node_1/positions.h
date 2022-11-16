@@ -9,6 +9,7 @@
 #include "CAN_controller.h"
 
 #define BASE_ADDRESS_ADC 0x1400
+#define CAN_ID 1
 
 struct joy_pos {   // Structure declaration
   uint8_t x_pos;           
@@ -83,35 +84,44 @@ struct slider_pos get_sliderpos(){
 }
 
 
-//unused
+uint8_t button_status(){
+
+	uint8_t value=PINB & 0x1;
+	return value;
+}
+
+
 void CAN_send_joypos(){
 	joystick = get_joypos();
 	CAN_message joystick_pos_msg;
+	uint8_t button=button_status();
+	slider = get_sliderpos();
 	
-	set_msg_id(&joystick_pos_msg ,1);
-	set_msg_length(&joystick_pos_msg, 4);
+	set_msg_id(&joystick_pos_msg ,CAN_ID);
+	set_msg_length(&joystick_pos_msg, 5);
 	
 	
 	if (joystick.x_currdir =="LEFT"){
 		joystick_pos_msg.data[0] =-joystick.x_pos ;
-		joystick_pos_msg.data[1] =0 ;
+		joystick_pos_msg.data[2] =0; //left
 	}
 	else
 	{
-		joystick_pos_msg.data[0] =0 ;
-		joystick_pos_msg.data[1] = joystick.x_pos;
+		joystick_pos_msg.data[0] =joystick.x_pos ;
+		joystick_pos_msg.data[2] =1; //right
 	}
 	
 	if (joystick.y_currdir =="DOWN"){
-		joystick_pos_msg.data[2] =-joystick.y_pos ;
-		joystick_pos_msg.data[3] =0 ;
+		joystick_pos_msg.data[1] =-joystick.y_pos ;
 	}
 	else
 	{
-		joystick_pos_msg.data[2] =0 ;
-		joystick_pos_msg.data[3] = joystick.y_pos;
+		joystick_pos_msg.data[1] = joystick.y_pos;
 	}
 		
+	
+	joystick_pos_msg.data[3] =button;
+	joystick_pos_msg.data[4] =slider.right;
 	
 	CAN_transmit(&joystick_pos_msg,0);
 }
@@ -122,11 +132,7 @@ void button_init(){
 	
 }
 
-uint8_t button_status(){
 
-	uint8_t value=PINB & 0x1;
-	return value;	
-}
 
 void CAN_send_slider(){
 	slider = get_sliderpos();
@@ -134,7 +140,7 @@ void CAN_send_slider(){
 
 	CAN_message slider_pos_msg;
 	
-	set_msg_id(&slider_pos_msg ,1);
+	set_msg_id(&slider_pos_msg ,CAN_ID);
 	set_msg_length(&slider_pos_msg, 3);
 	
 	slider_pos_msg.data[0] =slider.left;

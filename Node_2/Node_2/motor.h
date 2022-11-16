@@ -6,7 +6,8 @@
 #define ENC_MSK  0x1FE
 #define ENC_MIN 0
 #define ENC_MAX 8500
-#define MAX_MOTOR_SPEED 1500
+#define ENC_MID ENC_MAX/2
+#define MAX_MOTOR_SPEED 2000
 #define MIN_MOTOR_SPEED 1000
 
 uint8_t game_over=0;
@@ -35,13 +36,20 @@ uint16_t read_encoder(){
 	uint8_t high_byte  = (REG_PIOC_PDSR & ENC_MSK)>>1; // Read MJ2 to get high byte
 	REG_PIOD_SODR= SEL; //Set SEL high to output low byte	delay_us(200);
 	uint8_t low_byte = (REG_PIOC_PDSR & ENC_MSK)>>1; // Read MJ2 to get low byte
-	//reset_encoder();
-	REG_PIOD_SODR = NOT_OE; //Set !OE to high	//printf("h: %d, l:%d\n\r",high_byte,low_byte);	uint16_t enc_value= high_byte << 8 | low_byte;	if (enc_value & (1 << 15)) {
+	REG_PIOD_SODR = NOT_OE; //Set !OE to high	uint16_t enc_value= high_byte << 8 | low_byte;	if (enc_value & (1 << 15)) {
         return ((uint16_t) (~enc_value) + 1);
     }	return enc_value;
 }
 
-
+uint16_t joystick_map(uint16_t pos,uint8_t dir){
+		uint16_t val=pos;
+		if (dir){ //right
+			val =map(pos, 0, 100, (uint16_t)ENC_MID, ENC_MAX);
+		}
+		else val =map(pos, 0, 100,(uint16_t)ENC_MID,ENC_MIN); //left
+	return val;
+	
+}
 
 
 void set_motor_pos(uint16_t des_pos){
@@ -52,10 +60,6 @@ void set_motor_pos(uint16_t des_pos){
 	
 	uint16_t u=0;
 	int err=curr_pos-des_pos;
-	//printf("curr_pos: %d, des: %d, error: %d\n\r",curr_pos,des_pos, err);
-	//while(curr_pos!=des_pos){
-	//while(!((des_pos-500)<curr_pos && curr_pos<(des_pos+500))){
-	//while(!(-500<err && err<500)){
 	
 		err=curr_pos-des_pos;
 
@@ -64,10 +68,7 @@ void set_motor_pos(uint16_t des_pos){
 		if(u>MAX_MOTOR_SPEED){
 			u=MAX_MOTOR_SPEED;	
 		}
-		/*if(u<MIN_MOTOR_SPEED){
-			u=MIN_MOTOR_SPEED;	
-		}*/
-		//printf("curr: %d,err: %d,u:%d\n\r",curr_pos,err,u);
+
 		if (err>0){//LEFT
 			REG_PIOD_CODR =  DIR;
 		}
@@ -75,9 +76,36 @@ void set_motor_pos(uint16_t des_pos){
 			REG_PIOD_SODR =  DIR;
 		}
 		DAC_write(u);
-		//curr_pos = read_encoder(); 	
+
 	
-	//}
+}
+
+
+void set_motor_pos_joystick(uint16_t des_pos,uint8_t dir){
+	
+	uint16_t curr_pos = read_encoder();
+	des_pos=joystick_map(des_pos,dir);
+	
+	uint16_t u=0;
+	int err=curr_pos-des_pos;
+	
+		err=curr_pos-des_pos;
+
+		u=PID_controller(&PID,curr_pos,des_pos);
+		
+		if(u>MAX_MOTOR_SPEED){
+			u=MAX_MOTOR_SPEED;	
+		}
+
+		if (err>0){//LEFT
+			REG_PIOD_CODR =  DIR;
+		}
+		else if (err<0){ //RIGHT
+			REG_PIOD_SODR =  DIR;
+		}
+		DAC_write(u);
+	
+
 	
 }
 

@@ -1,4 +1,4 @@
-#define K_P 0.35
+#define K_P 0.5
 #define K_I 1
 #define K_D 10
 #define MOTOR_FREQ 50

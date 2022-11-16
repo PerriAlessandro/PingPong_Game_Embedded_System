@@ -5,7 +5,9 @@ void play_init(){
 }
 void routine(){
 	menu_navigation();
-	CAN_send_slider();
+	//CAN_send_slider();
+	if (is_playing())
+		CAN_send_joypos();
 	CAN_receive(&score_message);
 	check_game(&score_message);
 	_delay_ms(1000);

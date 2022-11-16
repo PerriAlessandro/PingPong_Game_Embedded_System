@@ -1,4 +1,7 @@
 
+#define EQ_PWM 630
+#define LEFT_PWM 882
+#define RIGHT_PWM 378
 uint16_t map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
@@ -13,9 +16,9 @@ void pwm_init(){
 	REG_PWM_CMR5 = PWM_CMR_CPRE_CLKA; //PWM Channel Mode Register
 	REG_PWM_CPRD5=8400; //PWM Channel Period Register
 	REG_PWM_ENA=PWM_ENA_CHID5; // PWM Enable Register
-	REG_PWM_CDTY5=8400-630; //PWM Channel Duty Cycle Register
+	REG_PWM_CDTY5=8400-EQ_PWM; //PWM Channel Duty Cycle Register
 }
 
-void pwm_set_dutycycle(CAN_MESSAGE * can_slider){
-	REG_PWM_CDTY5 = 8400 - map(can_slider->data[1], 0, 100, 882, 378); // 378 slowest
+void pwm_set_dutycycle(uint16_t val){ 
+ REG_PWM_CDTY5 = 8400 - map(val, 0, 100, LEFT_PWM, RIGHT_PWM); 
 }
